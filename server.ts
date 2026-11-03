@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const APP_VERSION = process.env.APP_VERSION || '2026.11.03.1';
+const APP_VERSION = process.env.APP_VERSION || '2026.11.03.2';
 
 app.use(express.json());
 
@@ -23,15 +23,24 @@ app.get('/api/version', (_req: Request, res: Response) => {
     year: 2026,
     month: 11,
     day: 3,
-    build: 1,
+    build: 2,
     releaseDate: '2026-11-03',
     projectName: 'K28 - Kolenkachel'
   });
 });
 
+function normalizeDockhandBaseUrl(rawUrl: string | undefined, defaultUrl: string): string {
+  if (!rawUrl || !rawUrl.trim()) return defaultUrl;
+  let cleaned = rawUrl.trim().replace(/\/+$/, '').replace(/\/api$/i, '');
+  if (!/^https?:\/\//i.test(cleaned)) {
+    cleaned = cleaned.includes('bycamiel.nl') ? `https://${cleaned}` : `http://${cleaned}`;
+  }
+  return cleaned;
+}
+
 const DOCKHAND_API_KEY = process.env.DOCKHAND_API_KEY || '';
-const DOCKHAND_API_URL = process.env.DOCKHAND_API_URL || 'http://10.0.0.100:3866';
-const DOCKHAND_REMOTE_URL = process.env.DOCKHAND_REMOTE_URL || 'https://docker.bycamiel.nl';
+const DOCKHAND_API_URL = normalizeDockhandBaseUrl(process.env.DOCKHAND_API_URL, 'http://10.0.0.100:3866');
+const DOCKHAND_REMOTE_URL = normalizeDockhandBaseUrl(process.env.DOCKHAND_REMOTE_URL, 'https://docker.bycamiel.nl');
 
 // Helper to mask key for safe client diagnostics
 function getMaskedKey(key: string): string {
@@ -51,8 +60,13 @@ async function fetchFromDockhand(endpoint: string, options: RequestInit = {}): P
     ...(options.headers as Record<string, string> || {})
   };
 
-  // Try remote domain URL first, then local LAN with port 3866
-  const targets = [DOCKHAND_REMOTE_URL, DOCKHAND_API_URL];
+  // Deduplicated target list: try remote domain URL first, then configured URLs, then LAN 10.0.0.100:3866
+  const targets = Array.from(new Set([
+    'https://docker.bycamiel.nl',
+    DOCKHAND_REMOTE_URL,
+    DOCKHAND_API_URL,
+    'http://10.0.0.100:3866'
+  ]));
 
   for (const baseUrl of targets) {
     const cleanBase = baseUrl.replace(/\/+$/, '');
@@ -222,7 +236,11 @@ async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+        watch: null,
+      },
       appType: 'spa'
     });
     app.use(vite.middlewares);

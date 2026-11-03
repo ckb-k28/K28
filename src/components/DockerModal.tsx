@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, Terminal, Container, FileText, Layers, ExternalLink, Sparkles, Key, RefreshCw, ShieldCheck, CheckCircle2, AlertCircle, Tag } from 'lucide-react';
+import { X, Copy, Check, Terminal, Container, FileText, Layers, ExternalLink, Sparkles, Key, RefreshCw, ShieldCheck, CheckCircle2, AlertCircle, Tag, GitBranch } from 'lucide-react';
 import { checkDockhandStatus, DockhandStatusResponse } from '../services/dockhandApi';
 import { APP_VERSION } from '../version';
 
@@ -10,19 +10,22 @@ interface DockerModalProps {
 
 const DOCKER_COMPOSE_SNIPPET = `services:
   # 1. K28 - Kolenkachel Web App & Dockhand Proxy (Port 3001)
-  k28-kolenkachel-app:
-    build: .
+  k28-kolenkachel:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: k28-kolenkachel:${APP_VERSION}
-    container_name: k28-kolenkachel-app
+    container_name: k28-kolenkachel
     restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
+      - NODE_ENV=production
       - PORT=3001
       - APP_VERSION=${APP_VERSION}
-      - DOCKHAND_API_KEY=dh_vUZ8SCgeCnA5DF2MOTE_jJSkIOfukoiTRh8Uk1Nv2aA
-      - DOCKHAND_API_URL=http://10.0.0.100:3866
-      - DOCKHAND_REMOTE_URL=https://docker.bycamiel.nl
+      - DOCKHAND_API_KEY=\${DOCKHAND_API_KEY}
+      - DOCKHAND_API_URL=\${DOCKHAND_API_URL:-http://10.0.0.100:3866}
+      - DOCKHAND_REMOTE_URL=\${DOCKHAND_REMOTE_URL:-https://docker.bycamiel.nl}
 
   # 2. Official Panonim/dynacat (Port 8081)
   dynacat:
@@ -43,12 +46,12 @@ const DOCKER_RUN_SNIPPET = `# 1. Build & Run K28 - Kolenkachel App (Port 3001)
 docker build -t k28-kolenkachel:${APP_VERSION} -t k28-kolenkachel:latest .
 
 docker run -d \\
-  --name k28-kolenkachel-app \\
+  --name k28-kolenkachel \\
   --restart unless-stopped \\
   -p 3001:3001 \\
   -e PORT=3001 \\
   -e APP_VERSION="${APP_VERSION}" \\
-  -e DOCKHAND_API_KEY="dh_vUZ8SCgeCnA5DF2MOTE_jJSkIOfukoiTRh8Uk1Nv2aA" \\
+  -e DOCKHAND_API_KEY="\${DOCKHAND_API_KEY}" \\
   -e DOCKHAND_API_URL="http://10.0.0.100:3866" \\
   -e DOCKHAND_REMOTE_URL="https://docker.bycamiel.nl" \\
   k28-kolenkachel:${APP_VERSION}
@@ -183,7 +186,7 @@ pages:
 
 export const DockerModal: React.FC<DockerModalProps> = ({ isOpen, onClose }) => {
   const [copiedType, setCopiedType] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'dockhand' | 'compose' | 'yaml' | 'cli' | 'portainer'>('dockhand');
+  const [activeTab, setActiveTab] = useState<'github' | 'dockhand' | 'compose' | 'yaml' | 'cli' | 'portainer'>('github');
   const [statusResult, setStatusResult] = useState<DockhandStatusResponse | null>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState<boolean>(false);
 
@@ -220,11 +223,11 @@ export const DockerModal: React.FC<DockerModalProps> = ({ isOpen, onClose }) => 
                   K28 - Kolenkachel Container Management
                 </h2>
                 <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-full">
-                  Dockhand API Active
+                  v{APP_VERSION}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Dockhand Integration (<code className="font-mono text-blue-500">10.0.0.100:3866</code>) & Dynacat Latest Release
+                GitHub Auto-Deploy & Dockhand Integration (<code className="font-mono text-blue-500">10.0.0.100:3866</code>)
               </p>
             </div>
           </div>
@@ -238,6 +241,18 @@ export const DockerModal: React.FC<DockerModalProps> = ({ isOpen, onClose }) => 
 
         {/* Tab switch */}
         <div className="flex items-center border-b border-slate-200 dark:border-slate-800 px-6 gap-2 bg-slate-50/50 dark:bg-slate-950/40 text-xs font-mono overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('github')}
+            className={`py-3 px-3 font-semibold border-b-2 transition-colors flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'github'
+                ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
+                : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+            }`}
+          >
+            <GitBranch className="w-3.5 h-3.5" />
+            <span>GitHub + Dockhand</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('dockhand')}
             className={`py-3 px-3 font-semibold border-b-2 transition-colors flex items-center gap-1.5 shrink-0 ${
@@ -301,6 +316,75 @@ export const DockerModal: React.FC<DockerModalProps> = ({ isOpen, onClose }) => 
 
         {/* Modal body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {activeTab === 'github' && (
+            <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
+              <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-bold text-emerald-900 dark:text-emerald-300">
+                    <GitBranch className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>Zero-Manual-Download GitHub → Dockhand Workflow</span>
+                  </div>
+                  <span className="px-2 py-0.5 text-[10px] font-mono bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded font-semibold">
+                    Git Stack Ready
+                  </span>
+                </div>
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  All repository files (<code className="font-mono">Dockerfile</code>, <code className="font-mono">docker-compose.yml</code>, <code className="font-mono">config/dynacat.yaml</code>, and <code className="font-mono">.github/workflows/docker-publish.yml</code>) are sanitized with zero hardcoded secrets so you can push directly to GitHub and let Dockhand pull updates automatically.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">1</span>
+                    <span>Push Project to Your GitHub Repository</span>
+                  </h4>
+                  <p className="text-slate-600 dark:text-slate-400 pl-7 leading-relaxed">
+                    Click the <strong>Export / Sync to GitHub</strong> icon in the top toolbar to create or update your GitHub repository (e.g. <code className="font-mono text-amber-500">https://github.com/&lt;your-username&gt;/k28-kolenkachel</code>). Every future change you make here can be pushed in one click.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">2</span>
+                    <span>Add GitHub Repository in Dockhand</span>
+                  </h4>
+                  <ol className="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400 pl-7 leading-relaxed">
+                    <li>Open Dockhand (<a href="https://docker.bycamiel.nl" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-mono">https://docker.bycamiel.nl</a> or <code className="font-mono">http://10.0.0.100:3866</code>).</li>
+                    <li>Go to <strong>Stacks</strong> → <strong>Create Stack</strong> → select <strong>Git Repository</strong>.</li>
+                    <li>Set <strong>Repository URL</strong> to your GitHub repo URL, branch <code className="font-mono">main</code>, and compose path <code className="font-mono">docker-compose.yml</code>.</li>
+                    <li>Enable <strong>Auto-Update / Git Polling or Webhook</strong> so Dockhand automatically rebuilds when you push a new version (<code className="font-mono">v{APP_VERSION}</code>).</li>
+                  </ol>
+                </div>
+
+                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">3</span>
+                      <span>Set Environment Variables in Dockhand Stack UI</span>
+                    </h4>
+                    <button
+                      onClick={() => handleCopy(`PORT=3001\nDOCKHAND_API_KEY=your_dockhand_api_key_here\nDOCKHAND_API_URL=http://10.0.0.100:3866\nDOCKHAND_REMOTE_URL=https://docker.bycamiel.nl`, 'env')}
+                      className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline font-mono text-[11px]"
+                    >
+                      {copiedType === 'env' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedType === 'env' ? 'Copied!' : 'Copy Env Vars'}</span>
+                    </button>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 pl-7">
+                    Add these in Dockhand&apos;s <strong>Environment Variables</strong> section so your API key stays safely on your home server and out of GitHub:
+                  </p>
+                  <pre className="ml-7 p-3 rounded-lg bg-slate-900 text-slate-200 text-[11px] font-mono overflow-x-auto border border-slate-800">
+{`PORT=3001
+DOCKHAND_API_KEY=<paste-your-dh-key-here>
+DOCKHAND_API_URL=http://10.0.0.100:3866
+DOCKHAND_REMOTE_URL=https://docker.bycamiel.nl`}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'dockhand' && (
             <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
               {/* Security Banner */}

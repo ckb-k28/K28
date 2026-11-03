@@ -23,12 +23,12 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-LABEL version="2026.11.03.1"
+LABEL version="2026.11.03.2"
 LABEL maintainer="camiel.boekelaar@gmail.com"
 
 ENV NODE_ENV=production
 ENV PORT=3001
-ENV APP_VERSION=2026.11.03.1
+ENV APP_VERSION=2026.11.03.2
 
 # Install production dependencies only
 COPY package*.json ./
