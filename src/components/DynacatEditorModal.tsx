@@ -24,6 +24,7 @@ import {
   ServerService,
 } from '../types/server';
 import { generateDynacatYaml, INITIAL_DYNACAT_LAYOUT } from '../data/defaultData';
+import { getServiceBrandIcon } from './ServiceIcons';
 
 interface DynacatEditorModalProps {
   isOpen: boolean;
@@ -657,12 +658,18 @@ export const DynacatEditorModal: React.FC<DynacatEditorModalProps> = ({
                     key={srv.id}
                     className="flex items-center justify-between p-3 rounded-xl border border-[#CFD2D6] dark:border-[#4D5156] bg-white/90 dark:bg-[#3A3D40]"
                   >
-                    <div className="min-w-0">
-                      <div className="font-mono font-bold truncate">
-                        {srv.name} <span className="text-[#5A5E63] dark:text-[#A5A9AE]">:{srv.port}</span>
-                      </div>
-                      <div className="text-[10px] font-mono text-[#FF8F00] truncate">
-                        {srv.category} · {srv.dashboardUrl}
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      {getServiceBrandIcon(srv.name, srv.category)}
+                      <div className="min-w-0">
+                        <div className="font-mono font-bold truncate">
+                          {srv.name}
+                        </div>
+                        <div className="text-[10px] font-mono text-[#5A5E63] dark:text-[#A5A9AE] truncate">
+                          <span>{srv.dockerContainer || srv.name.toLowerCase()}</span>
+                          <span className="text-[#FF8F00] font-semibold ml-0.5">:{srv.port}</span>
+                          <span className="mx-1">·</span>
+                          <span>{srv.category}</span>
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">

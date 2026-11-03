@@ -159,18 +159,14 @@ export const DynacatDashboard: React.FC<DynacatDashboardProps> = ({
                 <div className="shrink-0">{getServiceBrandIcon(service.name, service.category)}</div>
                 <div className="truncate">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium text-[#232527] dark:text-[#E6E7E9] group-hover:text-[#D84315] dark:group-hover:text-[#FF8F00] transition-colors">
+                    <span className="text-xs font-medium text-[#232527] dark:text-[#E6E7E9] group-hover:text-[#D84315] dark:group-hover:text-[#FF8F00] transition-colors truncate">
                       {service.name}
                     </span>
-                    <span className="font-mono text-[10px] text-slate-500 dark:text-[#E6E7E9]/50">
-                      :{service.port}
-                    </span>
                   </div>
-                  {service.dockerContainer && (
-                    <div className="text-[10px] font-mono text-slate-500 dark:text-[#E6E7E9]/50 truncate">
-                      {service.dockerContainer}
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 dark:text-[#E6E7E9]/55 truncate">
+                    <span className="truncate">{service.dockerContainer || service.name.toLowerCase()}</span>
+                    <span className="text-[#D84315] dark:text-[#FF8F00] font-semibold shrink-0">:{service.port}</span>
+                  </div>
                 </div>
               </div>
 

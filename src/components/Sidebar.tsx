@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { ServerService, ServiceCategory } from '../types/server';
 import { getLatencyBadge } from '../utils/formatters';
+import { getServiceBrandIcon } from './ServiceIcons';
 
 interface SidebarProps {
   services: ServerService[];
@@ -213,13 +214,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     : 'border-[#CFD2D6] dark:border-[#4D5156] bg-white/90 dark:bg-[#3A3D40] hover:border-[#FF8F00]/50 hover:bg-white dark:hover:bg-[#43474B]'
                 }`}
               >
-                {/* Top line: Indicator dot + Name + Port + External Link Button */}
+                {/* Top line: Brand Icon + Indicator dot + Name + External Link Button */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
+                    {getServiceBrandIcon(service.name, service.category)}
+
                     {/* Color-coded Status Dot */}
                     <span
                       title={`Status: ${service.status.toUpperCase()}`}
-                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                      className={`w-2 h-2 rounded-full shrink-0 ${
                         service.status === 'up'
                           ? 'bg-[#00B4D8] ring-2 ring-[#00B4D8]/20'
                           : service.status === 'warning'
@@ -230,10 +233,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                     <span className="text-xs font-bold text-[#232527] dark:text-[#E6E7E9] truncate">
                       {service.name}
-                    </span>
-
-                    <span className="font-mono text-[10px] text-[#5A5E63] dark:text-[#A5A9AE] shrink-0">
-                      :{service.port}
                     </span>
                   </div>
 
@@ -264,18 +263,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </div>
                 </div>
 
-                {/* Subtitle: Category icon and label */}
+                {/* Subtitle: Category icon and label + Container Name & Port */}
                 <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-[#5A5E63] dark:text-[#A5A9AE]">
                   <span className="text-[#FF8F00]">{getCategoryIcon(service.category)}</span>
                   <span>{service.category}</span>
-                  {service.dockerContainer && (
-                    <>
-                      <span aria-hidden="true" className="text-[#CFD2D6] dark:text-[#4D5156]">·</span>
-                      <span className="font-mono text-[10px] text-[#5A5E63] dark:text-[#A5A9AE] truncate">
-                        {service.dockerContainer}
-                      </span>
-                    </>
-                  )}
+                  <span aria-hidden="true" className="text-[#CFD2D6] dark:text-[#4D5156]">·</span>
+                  <span className="font-mono text-[10px] text-[#5A5E63] dark:text-[#A5A9AE] truncate">
+                    {service.dockerContainer || service.name.toLowerCase()}
+                    <span className="text-[#D84315] dark:text-[#FF8F00] font-semibold ml-0.5">
+                      :{service.port}
+                    </span>
+                  </span>
                 </div>
 
                 {/* Bottom line: Uptime status & Latency indicator */}

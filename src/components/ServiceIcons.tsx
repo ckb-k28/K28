@@ -1,235 +1,527 @@
 import React from 'react';
 
-export function getServiceBrandIcon(name: string, category?: string): React.ReactNode {
+/**
+ * K28 - Kolenkachel Service Brand Icons
+ * Strictly styled with the Kolenkachel Kleurenschema:
+ * - Nacht (Donker): #3A3D40 / #2C2F32
+ * - Dag (Licht): #E6E7E9
+ * - Gloeiende Kolen (Warm Roodoranje): #D84315
+ * - Knisperend Vuur (Amber Oranje): #FF8F00
+ * - Hete Vlamkern (Helder Blauw): #00B4D8
+ *
+ * Each icon preserves the recognizable brand logo silhouette of the service.
+ */
+export function getServiceBrandIcon(name: string, _category?: string): React.ReactNode {
   const n = name.toLowerCase();
 
-  // 1. Synology Photos (Check before synology nas)
-  if (n.includes('synology photos') || n.includes('photos')) {
+  const badgeBase =
+    'w-7 h-7 rounded-lg bg-[#E6E7E9] dark:bg-[#2C2F32] border border-[#CFD2D6] dark:border-[#4D5156] group-hover:border-[#FF8F00]/60 flex items-center justify-center shrink-0 shadow-2xs transition-colors';
+
+  // 1. Synology Photos (Check before Synology NAS) — Pinwheel aperture + camera frame
+  if (n.includes('synology photos') || n.includes('photos') || n.includes('foto')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#ff7a00]/15 flex items-center justify-center text-[#ff7a00]" title="Synology Photos">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
-          <circle cx="12" cy="13" r="3" />
+      <div className={badgeBase} title="Synology Photos">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <rect
+            x="2.5"
+            y="5.5"
+            width="19"
+            height="14"
+            rx="3"
+            stroke="#FF8F00"
+            strokeWidth="1.75"
+          />
+          <path
+            d="M8.5 5.5L10 3.5h4l1.5 2"
+            stroke="#D84315"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Synology Photos 4-color pinwheel blades in Kolenkachel palette */}
+          <path d="M12 8.5A4 4 0 0 1 16 12.5H12V8.5Z" fill="#FF8F00" />
+          <path d="M16 12.5A4 4 0 0 1 12 16.5V12.5H16Z" fill="#D84315" />
+          <path d="M12 16.5A4 4 0 0 1 8 12.5H12V16.5Z" fill="#00B4D8" />
+          <path d="M8 12.5A4 4 0 0 1 12 8.5V12.5H8Z" fill="#FF8F00" fillOpacity="0.65" />
+          <circle cx="17.5" cy="8.5" r="1" fill="#00B4D8" />
         </svg>
       </div>
     );
   }
 
-  // 2. Synology NAS
+  // 2. Synology Drive
+  if (n.includes('synology drive') || n.includes('drive')) {
+    return (
+      <div className={badgeBase} title="Synology Drive">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M8.5 4h7l5.5 9.5H14L8.5 4z"
+            fill="#00B4D8"
+          />
+          <path
+            d="M8.5 4L3 13.5l3.5 6 5.5-9.5L8.5 4z"
+            fill="#FF8F00"
+          />
+          <path
+            d="M6.5 19.5h11l3.5-6H10l-3.5 6z"
+            fill="#D84315"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  // 3. Synology NAS (DSM) — Recognizable dual-bay NAS tower/rack with status LEDs
   if (n.includes('synology') || n.includes('nas')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#0066b3]/20 flex items-center justify-center text-[#38bdf8]" title="Synology DSM">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zm0 9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3zm3-7.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm10-9h-4v2h4V7.5zm0 9h-4v2h4v-2z" />
+      <div className={badgeBase} title="Synology DSM NAS">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <rect
+            x="3"
+            y="4"
+            width="18"
+            height="6.5"
+            rx="1.75"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+          />
+          <rect
+            x="3"
+            y="13.5"
+            width="18"
+            height="6.5"
+            rx="1.75"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+          />
+          <circle cx="6.5" cy="7.25" r="1.2" fill="#FF8F00" />
+          <circle cx="6.5" cy="16.75" r="1.2" fill="#FF8F00" />
+          <path
+            d="M11 7.25h6.5M11 16.75h6.5"
+            stroke="#D84315"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
         </svg>
       </div>
     );
   }
 
-  // 3. Dockhand / Docker
+  // 4. Dockhand / Docker — Iconic Docker whale + stacked containers
   if (n.includes('dockhand') || n.includes('docker')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#0db7ed]/20 flex items-center justify-center text-[#0db7ed]" title="Dockhand Docker Manager">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M13.98 10.15h2.46v2.34h-2.46v-2.34zm-3.23 0h2.46v2.34h-2.46v-2.34zm-3.23 0h2.46v2.34H7.52v-2.34zm-3.23 0h2.46v2.34H4.29v-2.34zm9.69-3.23h2.46v2.34h-2.46V6.92zm-3.23 0h2.46v2.34h-2.46V6.92zm-3.23 0h2.46v2.34H7.52V6.92zm6.46-3.23h2.46v2.34h-2.46V3.69zM1 12.87c.36 4.7 4.18 8.44 8.9 8.44 5.92 0 9.87-4.04 10.74-9.35.7.07 1.94-.13 2.56-.99.5-.7.54-1.63.13-2.38-.6-.17-1.39-.12-1.89.17-.19.11-.34.27-.47.45-.63-.22-1.57-.3-2.61-.16-.06-.11-.13-.21-.21-.31-1.07-1.37-3.1-1.6-4.6-.52-.39.28-.68.64-.88 1.05H1.36c-.23.6-.36 1.25-.36 1.93v2.12z" />
+      <div className={badgeBase} title="Dockhand Container Manager">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          {/* Container blocks on whale back */}
+          <rect x="5" y="8.2" width="2.3" height="2.2" rx="0.3" fill="#FF8F00" />
+          <rect x="8" y="8.2" width="2.3" height="2.2" rx="0.3" fill="#00B4D8" />
+          <rect x="11" y="8.2" width="2.3" height="2.2" rx="0.3" fill="#FF8F00" />
+          <rect x="14" y="8.2" width="2.3" height="2.2" rx="0.3" fill="#00B4D8" />
+          <rect x="8" y="5.4" width="2.3" height="2.2" rx="0.3" fill="#00B4D8" />
+          <rect x="11" y="5.4" width="2.3" height="2.2" rx="0.3" fill="#D84315" />
+          <rect x="11" y="2.6" width="2.3" height="2.2" rx="0.3" fill="#FF8F00" />
+          {/* Docker Whale Hull */}
+          <path
+            d="M2.2 12.2h14.6c.45-1.1 1.35-1.65 2.55-1.5-.3.95-.1 1.75.55 2.2.8.05 1.55-.15 2.1-.6-.25 1.35-1.1 2.2-2.45 2.35C18.3 18.2 14.8 20.4 9.8 20.4c-4.4 0-7.2-2.3-7.6-8.2z"
+            fill="#00B4D8"
+          />
+          <circle cx="6.5" cy="15.2" r="0.9" fill="#E6E7E9" />
         </svg>
       </div>
     );
   }
 
-  // 4. Adguard
+  // 5. AdGuard Home — Iconic AdGuard Shield with checkmark
   if (n.includes('adguard') || n.includes('dns')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#68bc71]/20 flex items-center justify-center text-[#68bc71]" title="AdGuard Home">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+      <div className={badgeBase} title="AdGuard Home DNS">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M12 2.2L4 5.6v5.6c0 5.1 3.4 9.85 8 11.1 4.6-1.25 8-6 8-11.1V5.6L12 2.2z"
+            fill="#00B4D8"
+            fillOpacity="0.2"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M8.5 12.3l2.3 2.3 4.8-4.9"
+            stroke="#FF8F00"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </div>
     );
   }
 
-  // 5. Emby
+  // 6. Emby — Iconic Emby layered play-crystal / staggered triangles
   if (n.includes('emby')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#52B54B]/20 flex items-center justify-center text-[#52B54B]" title="Emby Server">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M11.02 4.41L2.24 9.48a1.5 1.5 0 0 0 0 2.6l8.78 5.07c.93.54 2.07-.13 2.07-1.2V5.61c0-1.07-1.14-1.74-2.07-1.2zm8.56 6.29l-3.52-2.03v6.66l3.52-2.03a1.5 1.5 0 0 0 0-2.6z" />
+      <div className={badgeBase} title="Emby Media Server">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M11 3.5L3.5 11l3.2 3.2L11 19.5l7.5-7.5-3.2-3.2L11 3.5z"
+            fill="#00B4D8"
+            fillOpacity="0.2"
+            stroke="#00B4D8"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9.5 8.2v7.6l6.2-3.8-6.2-3.8z"
+            fill="#FF8F00"
+          />
         </svg>
       </div>
     );
   }
 
-  // 6. Seerr / Jellyseerr / Overseerr
+  // 7. Seerr / Jellyseerr / Overseerr — Iconic Seerr Eye logo with iris & glint
   if (n.includes('seerr') || n.includes('verzoekjes') || n.includes('seer')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#8553c2]/20 flex items-center justify-center text-[#a172df]" title="Seerr Requests">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+      <div className={badgeBase} title="Seerr Media Requests">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M2.2 12C4 7.6 7.6 5 12 5s8 2.6 9.8 7c-1.8 4.4-5.4 7-9.8 7s-8-2.6-9.8-7z"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
+          <circle cx="12" cy="12" r="3.8" fill="#D84315" />
+          <circle cx="12" cy="12" r="1.8" fill="#FF8F00" />
+          <circle cx="13.4" cy="10.6" r="0.8" fill="#E6E7E9" />
         </svg>
       </div>
     );
   }
 
-  // 7. Bookorbit
-  if (n.includes('bookorbit') || n.includes('boeken') || n.includes('book')) {
+  // 8. Bookorbit / Chaptarr — Open Book with orbital ring
+  if (n.includes('bookorbit') || n.includes('boeken') || n.includes('book') || n.includes('chaptarr')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#38bdf8]/20 flex items-center justify-center text-[#38bdf8]" title="Bookorbit">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-          <circle cx="12" cy="10" r="2" />
+      <div className={badgeBase} title="Bookorbit">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M5.5 3.5H18.5v16H6.5a2 2 0 0 1-2-2V5.5a2 2 0 0 1 1-1.7z"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M4.5 16.5H18.5"
+            stroke="#00B4D8"
+            strokeWidth="1.5"
+          />
+          {/* Orbit ellipse & planet dot */}
+          <ellipse
+            cx="12"
+            cy="10"
+            rx="4.2"
+            ry="2"
+            transform="rotate(-24 12 10)"
+            stroke="#FF8F00"
+            strokeWidth="1.6"
+          />
+          <circle cx="12" cy="10" r="1.4" fill="#D84315" />
         </svg>
       </div>
     );
   }
 
-  // 8. Deadair
-  if (n.includes('deadair') || n.includes('radio')) {
+  // 9. Deadair / Lidarr — Radio / Audio broadcast waves & transmitter
+  if (n.includes('deadair') || n.includes('radio') || n.includes('lidarr') || n.includes('muziek')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#ec4899]/20 flex items-center justify-center text-[#f472b6]" title="Deadair Radio">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
-          <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
-          <circle cx="12" cy="12" r="2" />
-          <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
-          <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
+      <div className={badgeBase} title="Deadair Radio">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M5.2 18.8a9.6 9.6 0 0 1 0-13.6M18.8 5.2a9.6 9.6 0 0 1 0 13.6"
+            stroke="#D84315"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
+          <path
+            d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6"
+            stroke="#FF8F00"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
+          <circle cx="12" cy="12" r="2.2" fill="#00B4D8" />
         </svg>
       </div>
     );
   }
 
-  // 9. Actual Budget
+  // 10. Actual Budget — Stylized Actual "A" delta triangle & currency coin ring
   if (n.includes('actual') || n.includes('centen') || n.includes('budget')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#22c55e]/20 flex items-center justify-center text-[#4ade80]" title="Actual Budget">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-1.1a3.5 3.5 0 0 1-2.1-1.2l1.4-1.4a2 2 0 0 0 1.4.9c.7 0 1.3-.4 1.3-.9s-.4-.8-1.5-1.1c-1.8-.4-2.7-1.1-2.7-2.3 0-1.1.8-2 2.2-2.3V6h2v1.1a3.2 3.2 0 0 1 1.7.9l-1.4 1.4a1.8 1.8 0 0 0-1.1-.6c-.6 0-1.1.3-1.1.8s.4.7 1.5 1c1.8.4 2.7 1.2 2.7 2.4 0 1.2-.8 2.1-2.4 2.4z" />
+      <div className={badgeBase} title="Actual Budget">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+          />
+          <path
+            d="M12 6.5L7.8 16.5h2.2l.8-2.1h2.4l.8 2.1h2.2L12 6.5zm-.5 5.8l.5-1.5.5 1.5h-1z"
+            fill="#FF8F00"
+          />
         </svg>
       </div>
     );
   }
 
-  // 10. Norish (Recipes)
+  // 11. Norish — Culinary Fork, Knife & Recipe Leaf logo
   if (n.includes('norish') || n.includes('recepten')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#f97316]/20 flex items-center justify-center text-[#fb923c]" title="Norish Recipes">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M18 2h-3a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" />
-          <path d="M6 2v7a3 3 0 0 0 3 3v8" />
-          <path d="M9 2v4" />
-          <path d="M3 2v4" />
+      <div className={badgeBase} title="Norish Recipes">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          {/* Fork */}
+          <path
+            d="M6 3v5.5a2.5 2.5 0 0 0 2.5 2.5H9v9M6 3v3.5M9 3v3.5M11.5 3v5.5A2.5 2.5 0 0 1 9 11"
+            stroke="#FF8F00"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Chef knife / recipe leaf */}
+          <path
+            d="M17.5 3c-2 2-2.5 5.5-2.5 9h2.5v8"
+            stroke="#D84315"
+            strokeWidth="1.85"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </div>
     );
   }
 
-  // 11. Dawarich (Timeline / GPS)
+  // 12. Dawarich — GPS Map Pin & Timeline Trajectory
   if (n.includes('dawarich') || n.includes('tijdlijn')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#06b6d4]/20 flex items-center justify-center text-[#22d3ee]" title="Dawarich Timeline">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <circle cx="12" cy="10" r="3" />
-          <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z" />
+      <div className={badgeBase} title="Dawarich GPS Timeline">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M12 2.5a7 7 0 0 0-7 7c0 4.8 7 11.5 7 11.5s7-6.7 7-11.5a7 7 0 0 0-7-7z"
+            fill="#00B4D8"
+            fillOpacity="0.18"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
+          <circle cx="12" cy="9.5" r="2.6" fill="#FF8F00" />
         </svg>
       </div>
     );
   }
 
-  // 12. Evershelf (Pantry / Stock)
+  // 13. Evershelf — Stacked Pantry Shelves & Inventory Jars
   if (n.includes('evershelf') || n.includes('voorraad')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#a855f7]/20 flex items-center justify-center text-[#c084fc]" title="Evershelf Inventory">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <path d="M3 3h18v4H3z" />
-          <path d="M3 10h18v4H3z" />
-          <path d="M3 17h18v4H3z" />
+      <div className={badgeBase} title="Evershelf Pantry & Stock">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          {/* Shelves */}
+          <path
+            d="M3.5 9.5h17M3.5 19.5h17"
+            stroke="#FF8F00"
+            strokeWidth="1.85"
+            strokeLinecap="round"
+          />
+          {/* Top shelf jars */}
+          <rect x="5.5" y="4" width="4" height="5.5" rx="1" fill="#00B4D8" />
+          <rect x="11.5" y="5" width="4.5" height="4.5" rx="1" fill="#D84315" />
+          {/* Bottom shelf boxes */}
+          <rect x="6" y="13" width="5.5" height="6.5" rx="1" fill="#FF8F00" />
+          <rect x="13.5" y="14" width="4" height="5.5" rx="1" fill="#00B4D8" />
         </svg>
       </div>
     );
   }
 
-  // 13. Sabnzbd
+  // 14. SABnzbd — Recognizable SABnzbd Usenet hexagon + bold downward arrow logo
   if (n.includes('sabnzbd') || n.includes('downloads')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#d97706]/20 flex items-center justify-center text-[#f59e0b] font-mono font-extrabold text-[10px]" title="SABnzbd">
-        sab
+      <div className={badgeBase} title="SABnzbd Usenet Downloader">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <path
+            d="M12 2.3L20.2 7v10L12 21.7 3.8 17V7L12 2.3z"
+            fill="#FF8F00"
+            fillOpacity="0.18"
+            stroke="#FF8F00"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M12 7v8.2M8.5 12.2L12 15.8l3.5-3.6"
+            stroke="#D84315"
+            strokeWidth="2.1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </div>
     );
   }
 
-  // 14. Spotweb
+  // 15. Spotweb — Concentric Usenet Spot Radar / Bullseye
   if (n.includes('spotweb')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#2563eb]/20 flex items-center justify-center text-[#60a5fa]" title="Spotweb">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <circle cx="12" cy="12" r="10" />
-          <circle cx="12" cy="12" r="4" fill="#0b0c0e" />
+      <div className={badgeBase} title="Spotweb">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="5.2"
+            stroke="#FF8F00"
+            strokeWidth="1.6"
+            strokeDasharray="6 3"
+          />
+          <circle cx="12" cy="12" r="2.2" fill="#D84315" />
         </svg>
       </div>
     );
   }
 
-  // 15. Prowlarr
-  if (n.includes('prowlarr') || n.includes('servers')) {
+  // 16. Prowlarr — Recognizable Prowlarr Indexer Prowler / Target Crosshair Crest
+  if (n.includes('prowlarr') || n.includes('servers') || n.includes('index')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#e11d48]/20 flex items-center justify-center text-[#fb7185]" title="Prowlarr Indexer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-          <circle cx="12" cy="12" r="9" />
-          <circle cx="12" cy="12" r="4" />
-          <line x1="12" y1="3" x2="12" y2="7" />
-          <line x1="12" y1="17" x2="12" y2="21" />
-          <line x1="3" y1="12" x2="7" y2="12" />
-          <line x1="17" y1="12" x2="21" y2="12" />
+      <div className={badgeBase} title="Prowlarr Indexer Manager">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          {/* Prowler cat-ear / shield silhouette + radar */}
+          <path
+            d="M5 4.5l3.5 2.3a7.5 7.5 0 0 1 7 0L19 4.5l.8 4.8A7.8 7.8 0 0 1 12 19.8 7.8 7.8 0 0 1 4.2 9.3L5 4.5z"
+            fill="#D84315"
+            fillOpacity="0.2"
+            stroke="#D84315"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
+          <circle cx="9.3" cy="11.5" r="1.3" fill="#FF8F00" />
+          <circle cx="14.7" cy="11.5" r="1.3" fill="#FF8F00" />
+          <path d="M10.8 14.8L12 16l1.2-1.2" stroke="#00B4D8" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
       </div>
     );
   }
 
-  // 16. Radarr 4K (Check before radarr)
+  // 17. Radarr 4K (Check before Radarr) — Radarr Film Beacon + crisp 4K badge
   if (n.includes('radarr4k') || n.includes('films4k') || n.includes('4k')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#f59e0b]/25 flex items-center justify-center text-[#fbbf24] font-black text-[9px] border border-amber-500/40" title="Radarr 4K UHD">
-        4K
+      <div className={badgeBase} title="Radarr 4K UHD">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <circle
+            cx="11"
+            cy="11"
+            r="7.8"
+            stroke="#FF8F00"
+            strokeWidth="1.75"
+          />
+          <path d="M9.2 7.8v6.4l5.2-3.2-5.2-3.2z" fill="#D84315" />
+          {/* 4K Pill Badge in bottom-right */}
+          <rect x="11.5" y="13.8" width="10" height="7" rx="1.5" fill="#FF8F00" />
+          <text
+            x="16.5"
+            y="18.8"
+            textAnchor="middle"
+            fill="#232527"
+            fontSize="5.8"
+            fontFamily="monospace"
+            fontWeight="900"
+          >
+            4K
+          </text>
+        </svg>
       </div>
     );
   }
 
-  // 17. Radarr
+  // 18. Radarr — Recognizable Radarr film-reel / radar play beacon
   if (n.includes('radarr') || n.includes('films')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#eab308]/20 flex items-center justify-center text-[#eab308]" title="Radarr">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
+      <div className={badgeBase} title="Radarr Movies">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            fill="#FF8F00"
+            fillOpacity="0.16"
+            stroke="#FF8F00"
+            strokeWidth="1.75"
+          />
+          <path d="M9.8 8v8l6.8-4-6.8-4z" fill="#D84315" />
         </svg>
       </div>
     );
   }
 
-  // 18. Sonarr
+  // 19. Sonarr — Recognizable Sonarr broadcast TV ring + sonar target
   if (n.includes('sonarr') || n.includes('series')) {
     return (
-      <div className="w-6 h-6 rounded bg-[#0ea5e9]/20 flex items-center justify-center text-[#0ea5e9]" title="Sonarr">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V17a1 1 0 0 1-2 0v-.07A6 6 0 0 1 6.07 12H7a1 1 0 0 1 0-2h-.93A6 6 0 0 1 11 5.07V6a1 1 0 0 1 2 0v-.93A6 6 0 0 1 17.93 10H17a1 1 0 0 1 0 2h.93A6 6 0 0 1 13 16.93z" />
+      <div className={badgeBase} title="Sonarr TV Series">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <circle
+            cx="12"
+            cy="12"
+            r="9"
+            fill="#00B4D8"
+            fillOpacity="0.16"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+          />
+          <circle
+            cx="12"
+            cy="12"
+            r="4.8"
+            stroke="#FF8F00"
+            strokeWidth="1.65"
+          />
+          <circle cx="12" cy="12" r="1.8" fill="#00B4D8" />
         </svg>
       </div>
     );
   }
 
-  // 19. Bazarr
+  // 20. Bazarr — Recognizable Bazarr subtitle caption frame with text lines
   if (n.includes('bazarr') || n.includes('ondertitels')) {
     return (
-      <div className="w-6 h-6 rounded bg-slate-700/40 flex items-center justify-center text-slate-300" title="Bazarr Subtitles">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h4v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-4-4h6v2h-6z" />
+      <div className={badgeBase} title="Bazarr Subtitles">
+        <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4">
+          <rect
+            x="3"
+            y="5"
+            width="18"
+            height="14"
+            rx="2.5"
+            fill="#00B4D8"
+            fillOpacity="0.14"
+            stroke="#00B4D8"
+            strokeWidth="1.75"
+          />
+          <path
+            d="M6.5 11.5h4.5M13.5 11.5h4M6.5 15h7M15.5 15h2"
+            stroke="#FF8F00"
+            strokeWidth="1.85"
+            strokeLinecap="round"
+          />
         </svg>
       </div>
     );
   }
 
-  // Fallback icon based on name initials
+  // Fallback icon based on name initials in Kolenkachel Kleurenschema
   return (
-    <div className="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-slate-400 font-mono text-[10px] font-semibold">
+    <div className={`${badgeBase} text-[#FF8F00] font-mono text-[10px] font-bold`}>
       {name.slice(0, 2).toUpperCase()}
     </div>
   );

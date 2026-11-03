@@ -10,14 +10,15 @@ export interface VersionInfo {
 }
 
 export const CURRENT_VERSION: VersionInfo = {
-  version: '2026.11.03.8',
+  version: '2026.11.03.9',
   year: 2026,
   month: 11,
   day: 3,
-  build: 8,
+  build: 9,
   releaseDate: '2026-11-03',
   format: 'Year.month.day.build#',
   changes: [
+    'Moved port numbers next to container names and redesigned all 19 service logos in the Kolenkachel Kleurenschema (Build #9)',
     'Moved dynacat v3.0.2 component from footer to sidebar menu and added full Dynacat Widgets, Components & Live YAML Studio (Build #8)',
     'Extended Kolenkachel Kleurenschema (#3A3D40, #E6E7E9, #D84315, #FF8F00, #00B4D8) across Feeds & Alerts and Detailed Telemetry tabs (Build #7)',
     'Applied official Kolenkachel Kleurenschema: Nacht (#3A3D40), Dag (#E6E7E9), Gloeiende Kolen (#D84315), Knisperend Vuur (#FF8F00), and Hete Vlamkern (#00B4D8) (Build #6)',

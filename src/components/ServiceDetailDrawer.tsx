@@ -14,6 +14,7 @@ import {
 import { ServerService } from '../types/server';
 import { getStatusColor, getLatencyBadge } from '../utils/formatters';
 import { executeContainerAction } from '../services/dockhandApi';
+import { getServiceBrandIcon } from './ServiceIcons';
 
 interface ServiceDetailDrawerProps {
   service: ServerService | null;
@@ -87,25 +88,28 @@ export const ServiceDetailDrawer: React.FC<ServiceDetailDrawerProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-5 border-b border-[#CFD2D6] dark:border-[#4D5156] bg-white/90 dark:bg-[#3A3D40]">
           <div className="flex items-center gap-3">
-            <span
-              className={`w-3.5 h-3.5 rounded-full ${
-                service.status === 'up'
-                  ? 'bg-[#00B4D8] ring-4 ring-[#00B4D8]/20'
-                  : service.status === 'warning'
-                  ? 'bg-[#FF8F00] ring-4 ring-[#FF8F00]/20'
-                  : 'bg-[#D84315] ring-4 ring-[#D84315]/20'
-              }`}
-            />
+            {getServiceBrandIcon(service.name, service.category)}
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-[#232527] dark:text-[#E6E7E9]">
                   {service.name}
                 </h2>
-                <span className="font-mono text-xs text-[#5A5E63] dark:text-[#A5A9AE]">
-                  :{service.port}
-                </span>
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    service.status === 'up'
+                      ? 'bg-[#00B4D8] ring-2 ring-[#00B4D8]/20'
+                      : service.status === 'warning'
+                      ? 'bg-[#FF8F00] ring-2 ring-[#FF8F00]/20'
+                      : 'bg-[#D84315] ring-2 ring-[#D84315]/20'
+                  }`}
+                />
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#5A5E63] dark:text-[#A5A9AE] mt-0.5">
+              <div className="flex items-center gap-1.5 text-xs text-[#5A5E63] dark:text-[#A5A9AE] mt-0.5">
+                <span className="font-mono text-[11px] text-[#232527] dark:text-[#E6E7E9]">
+                  {service.dockerContainer || service.name.toLowerCase()}
+                  <span className="text-[#D84315] dark:text-[#FF8F00] font-semibold">:{service.port}</span>
+                </span>
+                <span aria-hidden="true">·</span>
                 <span>{service.category}</span>
                 <span aria-hidden="true">·</span>
                 <span className="font-semibold text-[#232527] dark:text-[#E6E7E9]">
@@ -279,7 +283,8 @@ export const ServiceDetailDrawer: React.FC<ServiceDetailDrawerProps> = ({
                 <span className="text-[#5A5E63] dark:text-[#A5A9AE]">Docker Container</span>
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-semibold text-[#232527] dark:text-[#E6E7E9]">
-                    {service.dockerContainer || 'Bare metal / Systemd'}
+                    {service.dockerContainer || service.name.toLowerCase()}
+                    <span className="text-[#D84315] dark:text-[#FF8F00]">:{service.port}</span>
                   </span>
                   <a
                     href="http://10.0.0.100:3866"

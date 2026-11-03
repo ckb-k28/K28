@@ -1,6 +1,6 @@
 # 🔥 K28 - Kolenkachel · Homelab Operations Hub
 
-![Version](https://img.shields.io/badge/version-2026.11.03.8-f59e0b?style=flat-square)
+![Version](https://img.shields.io/badge/version-2026.11.03.9-f59e0b?style=flat-square)
 ![Dynacat](https://img.shields.io/badge/dynacat-v3.0.2-10b981?style=flat-square)
 ![Dockhand](https://img.shields.io/badge/dockhand-API%20Proxy-3b82f6?style=flat-square)
 ![Docker](https://img.shields.io/badge/docker-ready-0ea5e9?style=flat-square)
@@ -117,7 +117,7 @@ git pull && docker compose up -d --build
 ## 🏷️ Versioning Scheme (`Year.month.day.build#`)
 
 This project uses the **`Year.month.day.build#`** release format:
-- **Current Version:** `2026.11.03.8`
+- **Current Version:** `2026.11.03.9`
 - **Source of Truth:** `src/version.ts` and `package.json`
 - **API Endpoint:** `GET /api/version` returns JSON build metadata.
 - **GitHub Actions:** `.github/workflows/docker-publish.yml` automatically tags and publishes images to GitHub Container Registry (`ghcr.io`) using the version in `package.json`.
