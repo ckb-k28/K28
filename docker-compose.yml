@@ -1,16 +1,21 @@
 # ========================================================
 # Docker Compose for K28 - Kolenkachel Homelab Hub
-# Ready for Dockhand Git Repository Stack Auto-Deploy
-# Host: 10.0.0.100 | Domain: bycamiel.nl | Version: 2026.11.03.10
+# Ready for Dockhand Pre-Built GHCR Image or Git Stack
+# Host: 10.0.0.100 | Domain: bycamiel.nl | Version: 2026.11.03.12
 # ========================================================
 
 services:
   # 1. K28 - Kolenkachel Operations Hub & Dockhand Manager (Port 3001)
   k28-kolenkachel:
+    # To pull the complete pre-built image from GitHub (GHCR) without building locally,
+    # ensure package visibility is Public at https://github.com/users/ckb-k28/packages/container/package/k28/settings
+    # and replace the 'build:' block below with:
+    # image: ghcr.io/ckb-k28/k28:main
+    # pull_policy: always
     build:
       context: .
       dockerfile: Dockerfile
-    image: k28-kolenkachel:2026.11.03.10
+    image: ${GHCR_IMAGE:-k28-kolenkachel:2026.11.03.12}
     container_name: k28-kolenkachel
     restart: unless-stopped
     ports:
@@ -18,7 +23,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - APP_VERSION=2026.11.03.10
+      - APP_VERSION=2026.11.03.12
       - DOCKHAND_API_KEY=${DOCKHAND_API_KEY:-}
       - DOCKHAND_API_URL=${DOCKHAND_API_URL:-http://10.0.0.100:3866}
       - DOCKHAND_REMOTE_URL=${DOCKHAND_REMOTE_URL:-https://docker.bycamiel.nl}

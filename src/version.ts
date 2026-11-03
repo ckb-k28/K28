@@ -10,14 +10,16 @@ export interface VersionInfo {
 }
 
 export const CURRENT_VERSION: VersionInfo = {
-  version: '2026.11.03.10',
+  version: '2026.11.03.12',
   year: 2026,
   month: 11,
   day: 3,
-  build: 10,
+  build: 12,
   releaseDate: '2026-11-03',
   format: 'Year.month.day.build#',
   changes: [
+    'Fixed ghcr.io/ckb-k28/k28:main unauthorized pull error by publishing :main branch tag in GitHub Actions and adding GHCR visibility & registry guide (Build #12)',
+    'Added automatic GitHub Container Registry (ghcr.io) pre-built image workflow and zero-CLI Dockhand pull configuration (Build #11)',
     'Changed service cards to open links directly in a new tab on click and added a Pencil button to edit services (Build #10)',
     'Moved port numbers next to container names and redesigned all 19 service logos in the Kolenkachel Kleurenschema (Build #9)',
     'Moved dynacat v3.0.2 component from footer to sidebar menu and added full Dynacat Widgets, Components & Live YAML Studio (Build #8)',

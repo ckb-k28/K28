@@ -12,7 +12,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
@@ -25,28 +24,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract version from package.json
-        id: pkg
-        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      - name: Prepare lowercase image name & version
+        id: prep
+        run: |
+          IMAGE_LC=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          VERSION=$(node -p "require('./package.json').version")
+          echo "IMAGE_NAME=${IMAGE_LC}" >> $GITHUB_OUTPUT
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry (ghcr.io)
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract Docker metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ steps.prep.outputs.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=${{ steps.pkg.outputs.VERSION }}
+            type=ref,event=branch
+            type=raw,value=main
+            type=raw,value=latest
+            type=raw,value=${{ steps.prep.outputs.VERSION }}
             type=sha
 
-      - name: Build and push Docker image
+      - name: Build and push complete Docker image to GHCR
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -54,3 +59,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Write GHCR Image URL to GitHub Actions Summary
+        run: |
+          echo "### ✅ Complete Docker Image Published to GitHub Container Registry" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Use this pre-built image in **Dockhand** (no bash commands or local building needed):" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`yaml" >> $GITHUB_STEP_SUMMARY
+          echo "image: ghcr.io/${{ steps.prep.outputs.IMAGE_NAME }}:main" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Available Tags:** \`ghcr.io/${{ steps.prep.outputs.IMAGE_NAME }}:main\`, \`ghcr.io/${{ steps.prep.outputs.IMAGE_NAME }}:latest\`, \`ghcr.io/${{ steps.prep.outputs.IMAGE_NAME }}:${{ steps.prep.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Important (Avoid \`unauthorized\` error):** By default, GitHub sets new container packages to **Private**. Go to **https://github.com/users/ckb-k28/packages/container/package/k28/settings** → **Change visibility** → **Public** so Dockhand can pull without authentication." >> $GITHUB_STEP_SUMMARY

@@ -1,6 +1,6 @@
 # 🔥 K28 - Kolenkachel · Homelab Operations Hub
 
-![Version](https://img.shields.io/badge/version-2026.11.03.10-f59e0b?style=flat-square)
+![Version](https://img.shields.io/badge/version-2026.11.03.12-f59e0b?style=flat-square)
 ![Dynacat](https://img.shields.io/badge/dynacat-v3.0.2-10b981?style=flat-square)
 ![Dockhand](https://img.shields.io/badge/dockhand-API%20Proxy-3b82f6?style=flat-square)
 ![Docker](https://img.shields.io/badge/docker-ready-0ea5e9?style=flat-square)
@@ -17,7 +17,7 @@ It provides real-time server metrics, dual-mode service routing (**LAN IP `10.0.
 - **Secure Dockhand API Proxy (`/api/dockhand/*`):** Server-side Express proxy that authenticates with Dockhand using `DOCKHAND_API_KEY` without ever exposing credentials to the browser.
 - **Live Telemetry & Storage Health:** Real-time CPU load, core temperatures, DDR4 memory allocation, network throughput (`eth0`), and ZFS/ext4 disk pool capacity.
 - **Mobile Alerts & PWA Support:** Installable on iOS and Android home screens with QR-code pairing for instant `ntfy.sh` and webhook notifications when a container stops or latency spikes.
-- **Zero-Manual-Download Updates:** Designed to be added directly as a **Git Repository Stack** in Dockhand so updates deploy automatically whenever changes are pushed to GitHub.
+- **Pre-Built GitHub Container Image (`ghcr.io/ckb-k28/k28`):** `.github/workflows/docker-publish.yml` automatically builds and publishes `ghcr.io/ckb-k28/k28:main` and `ghcr.io/ckb-k28/k28:latest` on GitHub's cloud servers on every push, so Dockhand can pull the finished image with zero bash commands.
 
 ---
 
@@ -31,16 +31,55 @@ It provides real-time server metrics, dual-mode service routing (**LAN IP `10.0.
 
 ---
 
-## 🚀 Automatic Deployment with Dockhand (Recommended)
+## 📦 Pull Complete Pre-Built Image from GitHub (`ghcr.io/ckb-k28/k28:main` — Zero Bash Commands)
 
-You do not need to download files manually after updates. Connect this GitHub repository directly to your **Dockhand** server environment:
+Every time you push or export this project to GitHub (`main` branch), **GitHub Actions** (`.github/workflows/docker-publish.yml`) automatically builds the `Dockerfile` in the cloud and publishes a ready-to-pull Docker image to **GitHub Container Registry (GHCR)**:
+
+```text
+ghcr.io/ckb-k28/k28:main
+ghcr.io/ckb-k28/k28:latest
+```
+
+### ⚠️ Fixing `Head "https://ghcr.io/v2/ckb-k28/k28/manifests/main": unauthorized`
+GitHub sets all newly created container packages to **Private** by default (even if your repository is public), and returns `unauthorized` if `:main` hasn't been built yet or is still private. To fix this in 3 clicks:
+1. Push this commit to GitHub and wait ~60 seconds for the **Actions** tab workflow (`Build & Publish Docker Image (GHCR)`) to finish with a green checkmark.
+2. Open your package settings directly at: `https://github.com/users/ckb-k28/packages/container/package/k28/settings` *(or on `github.com/ckb-k28/k28`, click **Packages** in the right sidebar → `k28` → **Package settings**)*.
+3. Scroll down to **Danger Zone** → click **Change visibility** → select **Public**. *(Now Dockhand can pull `ghcr.io/ckb-k28/k28:main` without any authentication token).*
+
+### Pull the Image in Dockhand Web UI
+In **Dockhand** ([`https://docker.bycamiel.nl`](https://docker.bycamiel.nl) or `http://10.0.0.100:3866`), create a **Stack** (or Container) with this Compose configuration:
+
+```yaml
+services:
+  k28-kolenkachel:
+    image: ghcr.io/ckb-k28/k28:main
+    pull_policy: always
+    container_name: k28-kolenkachel
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DOCKHAND_API_KEY=${DOCKHAND_API_KEY}
+      - DOCKHAND_API_URL=http://10.0.0.100:3866
+      - DOCKHAND_REMOTE_URL=https://docker.bycamiel.nl
+```
+
+Whenever you push a new update to GitHub, simply click **Pull / Redeploy** in the Dockhand Web UI—no terminal or bash commands needed.
+
+---
+
+## 🚀 Alternative: Automatic Git Repository Stack in Dockhand
+
+You can also connect this GitHub repository directly as a **Git Repository Stack** in your **Dockhand** server environment:
 
 ### 1. Add Repository as a Stack in Dockhand
 1. Open **Dockhand** at [`https://docker.bycamiel.nl`](https://docker.bycamiel.nl) or `http://10.0.0.100:3866`.
 2. Navigate to **Stacks** → **Create Stack** → choose **Git Repository**.
 3. Configure the repository settings:
    - **Stack Name:** `k28-kolenkachel`
-   - **Repository URL:** `https://github.com/<your-username>/<your-repo>.git`
+   - **Repository URL:** `https://github.com/ckb-k28/k28.git`
    - **Branch:** `main`
    - **Compose Path:** `docker-compose.yml`
 4. Enable **Auto-Update (Git Polling / Webhook)** so Dockhand automatically pulls and rebuilds whenever you push a new commit.
@@ -70,8 +109,8 @@ If you prefer deploying via SSH on `10.0.0.100`:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/ckb-k28/k28.git
+cd k28
 
 # 2. Create your local .env file (git-ignored)
 cp .env.example .env
@@ -117,10 +156,10 @@ git pull && docker compose up -d --build
 ## 🏷️ Versioning Scheme (`Year.month.day.build#`)
 
 This project uses the **`Year.month.day.build#`** release format:
-- **Current Version:** `2026.11.03.10`
+- **Current Version:** `2026.11.03.12`
 - **Source of Truth:** `src/version.ts` and `package.json`
 - **API Endpoint:** `GET /api/version` returns JSON build metadata.
-- **GitHub Actions:** `.github/workflows/docker-publish.yml` automatically tags and publishes images to GitHub Container Registry (`ghcr.io`) using the version in `package.json`.
+- **GitHub Actions:** `.github/workflows/docker-publish.yml` automatically tags and publishes images to GitHub Container Registry (`ghcr.io/ckb-k28/k28:main` and `:latest`) using the version in `package.json`.
 
 ---
 

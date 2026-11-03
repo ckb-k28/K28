@@ -42,9 +42,16 @@ const DOCKER_COMPOSE_SNIPPET = `services:
     environment:
       - TZ=Europe/Amsterdam`;
 
-const DOCKER_RUN_SNIPPET = `# 1. Build & Run K28 - Kolenkachel App (Port 3001)
+const DOCKER_RUN_SNIPPET = `# Option A: Build image directly from Git URL (no git clone required)
+docker build -t k28-kolenkachel:${APP_VERSION} -t k28-kolenkachel:latest \\
+  https://github.com/<YOUR_GITHUB_USER>/<YOUR_REPO>.git#main
+
+# Option B: Clone repository from Git & build locally
+git clone https://github.com/<YOUR_GITHUB_USER>/<YOUR_REPO>.git k28-kolenkachel
+cd k28-kolenkachel
 docker build -t k28-kolenkachel:${APP_VERSION} -t k28-kolenkachel:latest .
 
+# 1. Run K28 - Kolenkachel App (Port 3001)
 docker run -d \\
   --name k28-kolenkachel \\
   --restart unless-stopped \\
@@ -54,7 +61,7 @@ docker run -d \\
   -e DOCKHAND_API_KEY="\${DOCKHAND_API_KEY}" \\
   -e DOCKHAND_API_URL="http://10.0.0.100:3866" \\
   -e DOCKHAND_REMOTE_URL="https://docker.bycamiel.nl" \\
-  k28-kolenkachel:${APP_VERSION}
+  k28-kolenkachel:latest
 
 # 2. Run Dynacat on Port 8081
 docker run -d \\
@@ -318,49 +325,78 @@ export const DockerModal: React.FC<DockerModalProps> = ({ isOpen, onClose }) => 
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {activeTab === 'github' && (
             <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300">
-              <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-300/80 dark:border-amber-800/50 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-emerald-900 dark:text-emerald-300">
-                    <GitBranch className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>Zero-Manual-Download GitHub → Dockhand Workflow</span>
+                  <div className="flex items-center gap-2 font-bold text-amber-900 dark:text-amber-300">
+                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span>Fixing: <code className="font-mono">Head &quot;https://ghcr.io/v2/ckb-k28/k28/manifests/main&quot;: unauthorized</code></span>
                   </div>
-                  <span className="px-2 py-0.5 text-[10px] font-mono bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 rounded font-semibold">
-                    Git Stack Ready
+                  <span className="px-2 py-0.5 text-[10px] font-mono bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 rounded font-semibold">
+                    Quick Fix
                   </span>
                 </div>
                 <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                  All repository files (<code className="font-mono">Dockerfile</code>, <code className="font-mono">docker-compose.yml</code>, <code className="font-mono">config/dynacat.yaml</code>, and <code className="font-mono">.github/workflows/docker-publish.yml</code>) are sanitized with zero hardcoded secrets so you can push directly to GitHub and let Dockhand pull updates automatically.
+                  GitHub Container Registry returns <code className="font-mono text-amber-600 dark:text-amber-400">unauthorized</code> for two reasons: (1) new packages on GitHub default to <strong>Private</strong> even when the repository is public, or (2) the <code className="font-mono">:main</code> tag hasn&apos;t finished building in GitHub Actions yet.
                 </p>
+                <ol className="list-decimal list-inside space-y-1 text-slate-700 dark:text-slate-300 pt-1">
+                  <li>
+                    <strong>Push this update to GitHub</strong> and wait ~60s for the <strong>Actions</strong> tab (<code className="font-mono">Build &amp; Publish Docker Image (GHCR)</code>) to turn green (it now publishes both <code className="font-mono">:main</code> and <code className="font-mono">:latest</code>).
+                  </li>
+                  <li>
+                    Open your package settings at{' '}
+                    <a
+                      href="https://github.com/users/ckb-k28/packages/container/package/k28/settings"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-mono"
+                    >
+                      github.com/users/ckb-k28/packages/container/package/k28/settings
+                    </a>
+                    {' '}→ scroll down to <strong>Danger Zone</strong> → click <strong>Change visibility</strong> → set to <strong>Public</strong>.
+                  </li>
+                </ol>
               </div>
 
               <div className="space-y-3">
                 <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2">
-                  <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">1</span>
-                    <span>Push Project to Your GitHub Repository</span>
-                  </h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">1</span>
+                      <span>Pull <code className="font-mono text-emerald-500">ghcr.io/ckb-k28/k28:main</code> in Dockhand Web UI</span>
+                    </h4>
+                    <button
+                      onClick={() => handleCopy(`services:\n  k28-kolenkachel:\n    image: ghcr.io/ckb-k28/k28:main\n    pull_policy: always\n    container_name: k28-kolenkachel\n    restart: unless-stopped\n    ports:\n      - "3001:3001"\n    environment:\n      - NODE_ENV=production\n      - PORT=3001\n      - DOCKHAND_API_KEY=\${DOCKHAND_API_KEY}\n      - DOCKHAND_API_URL=http://10.0.0.100:3866\n      - DOCKHAND_REMOTE_URL=https://docker.bycamiel.nl`, 'ghcr-compose')}
+                      className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline font-mono text-[11px]"
+                    >
+                      {copiedType === 'ghcr-compose' ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedType === 'ghcr-compose' ? 'Copied!' : 'Copy GHCR Stack'}</span>
+                    </button>
+                  </div>
                   <p className="text-slate-600 dark:text-slate-400 pl-7 leading-relaxed">
-                    Click the <strong>Export / Sync to GitHub</strong> icon in the top toolbar to create or update your GitHub repository (e.g. <code className="font-mono text-amber-500">https://github.com/&lt;your-username&gt;/k28-kolenkachel</code>). Every future change you make here can be pushed in one click.
+                    In Dockhand (<a href="https://docker.bycamiel.nl" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-mono">https://docker.bycamiel.nl</a>), deploy this pre-built image:
                   </p>
-                </div>
-
-                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2">
-                  <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">2</span>
-                    <span>Add GitHub Repository in Dockhand</span>
-                  </h4>
-                  <ol className="list-decimal list-inside space-y-1 text-slate-600 dark:text-slate-400 pl-7 leading-relaxed">
-                    <li>Open Dockhand (<a href="https://docker.bycamiel.nl" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-mono">https://docker.bycamiel.nl</a> or <code className="font-mono">http://10.0.0.100:3866</code>).</li>
-                    <li>Go to <strong>Stacks</strong> → <strong>Create Stack</strong> → select <strong>Git Repository</strong>.</li>
-                    <li>Set <strong>Repository URL</strong> to your GitHub repo URL, branch <code className="font-mono">main</code>, and compose path <code className="font-mono">docker-compose.yml</code>.</li>
-                    <li>Enable <strong>Auto-Update / Git Polling or Webhook</strong> so Dockhand automatically rebuilds when you push a new version (<code className="font-mono">v{APP_VERSION}</code>).</li>
-                  </ol>
+                  <pre className="ml-7 p-3 rounded-lg bg-slate-900 text-slate-200 text-[11px] font-mono overflow-x-auto border border-slate-800">
+{`services:
+  k28-kolenkachel:
+    image: ghcr.io/ckb-k28/k28:main
+    pull_policy: always
+    container_name: k28-kolenkachel
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DOCKHAND_API_KEY=\${DOCKHAND_API_KEY}
+      - DOCKHAND_API_URL=http://10.0.0.100:3866
+      - DOCKHAND_REMOTE_URL=https://docker.bycamiel.nl`}
+                  </pre>
                 </div>
 
                 <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">3</span>
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-500 font-mono text-[11px] flex items-center justify-center">2</span>
                       <span>Set Environment Variables in Dockhand Stack UI</span>
                     </h4>
                     <button
