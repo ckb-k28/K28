@@ -8,9 +8,9 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies (using --legacy-peer-deps to avoid peer conflict errors in CI)
 COPY package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Copy source files
 COPY . .
@@ -23,16 +23,16 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-LABEL version="2026.11.03.2"
+LABEL version="2026.11.03.4"
 LABEL maintainer="camiel.boekelaar@gmail.com"
 
 ENV NODE_ENV=production
 ENV PORT=3001
-ENV APP_VERSION=2026.11.03.2
+ENV APP_VERSION=2026.11.03.4
 
 # Install production dependencies only
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copy built assets and compiled server from builder stage
 COPY --from=builder /app/dist ./dist
