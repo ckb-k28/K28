@@ -1,0 +1,6 @@
+{
+  "name": "PulseNOC - Home Server Telemetry & Mobile Alerts",
+  "description": "Real-time home server monitoring dashboard with live metrics, uptime indicators, service navigation, and direct mobile alerts via Push, ntfy, and webhooks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

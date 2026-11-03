@@ -1,0 +1,52 @@
+# ========================================================
+# Docker Compose for K28 - Kolenkachel Homelab Hub
+# Host: 10.0.0.100 | Domain: bycamiel.nl
+# ========================================================
+
+services:
+  # 1. K28 - Kolenkachel Operations Hub & Dockhand Manager (Port 3001)
+  k28-kolenkachel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: k28-kolenkachel:2026.11.03.1
+    container_name: k28-kolenkachel
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - APP_VERSION=2026.11.03.1
+      - DOCKHAND_API_KEY=${DOCKHAND_API_KEY}
+      - DOCKHAND_API_URL=${DOCKHAND_API_URL:-http://10.0.0.100:3866}
+      - DOCKHAND_REMOTE_URL=${DOCKHAND_REMOTE_URL:-https://docker.bycamiel.nl}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # 2. Dynacat Official Homelab Engine (Port 8081)
+  dynacat:
+    image: ghcr.io/panonim/dynacat:latest
+    container_name: dynacat
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./config:/app/config
+      - ./assets:/app/assets
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=Europe/Amsterdam
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

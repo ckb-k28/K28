@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#0b0c0e"/>
+  <rect x="32" y="32" width="448" height="448" rx="100" fill="#13151b" stroke="#252a38" stroke-width="10"/>
+  <!-- Dynacat stylized ears and face -->
+  <polygon points="120,240 100,110 200,165" fill="#f59e0b"/>
+  <polygon points="392,240 412,110 312,165" fill="#f59e0b"/>
+  <path d="M110,210 C130,150 190,140 256,140 C322,140 382,150 402,210 C422,270 410,350 360,400 C310,440 202,440 152,400 C102,350 90,270 110,210 Z" fill="#181b23" stroke="#f59e0b" stroke-width="16"/>
+  <!-- Eyes -->
+  <ellipse cx="190" cy="270" rx="22" ry="28" fill="#f59e0b"/>
+  <ellipse cx="322" cy="270" rx="22" ry="28" fill="#f59e0b"/>
+  <circle cx="196" cy="265" r="9" fill="#0b0c0e"/>
+  <circle cx="328" cy="265" r="9" fill="#0b0c0e"/>
+  <!-- Nose & Whiskers -->
+  <polygon points="256,315 244,302 268,302" fill="#f59e0b"/>
+  <path d="M256,315 L256,330 C256,338 244,345 235,345 M256,330 C256,338 268,345 277,345" stroke="#f59e0b" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <!-- Whiskers -->
+  <line x1="160" y1="315" x2="80" y2="305" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+  <line x1="160" y1="335" x2="75" y2="340" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+  <line x1="352" y1="315" x2="432" y2="305" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+  <line x1="352" y1="335" x2="437" y2="340" stroke="#4b5563" stroke-width="6" stroke-linecap="round"/>
+</svg>

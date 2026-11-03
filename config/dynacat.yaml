@@ -1,0 +1,150 @@
+# Dynacat Configuration for K28 - Kolenkachel
+# Documentation: https://dynacat.artur.zone
+# Project: https://github.com/Panonim/dynacat (Latest Release v3.0.2)
+
+theme:
+  background: "#0b0c0e"
+  contrast-multiplier: 1.1
+  primary-color: "#f59e0b"
+
+pages:
+  - name: Home
+    columns:
+      # 1. Infrastructure Column
+      - size: small
+        widgets:
+          - type: group
+            title: INFRASTRUCTURE
+            widgets:
+              - type: service
+                name: Synology NAS
+                url: https://nas.bycamiel.nl
+                icon: synology
+              - type: service
+                name: Dockhand
+                url: https://docker.bycamiel.nl
+                icon: docker
+              - type: service
+                name: Adguard
+                url: https://adguard.bycamiel.nl
+                icon: adguard-home
+
+      # 2. Apps Column
+      - size: small
+        widgets:
+          - type: group
+            title: APPS
+            widgets:
+              - type: service
+                name: Actual Budget
+                url: https://centen.bycamiel.nl
+                icon: budget
+              - type: service
+                name: Norish
+                url: https://recepten.bycamiel.nl
+                icon: recipes
+              - type: service
+                name: Dawarich
+                url: https://tijdlijn.bycamiel.nl
+                icon: timeline
+              - type: service
+                name: Evershelf
+                url: https://voorraad.bycamiel.nl
+                icon: shelf
+
+      # 3. Media Column
+      - size: small
+        widgets:
+          - type: group
+            title: MEDIA
+            widgets:
+              - type: service
+                name: Emby
+                url: https://emby.bycamiel.nl
+                icon: emby
+              - type: service
+                name: Seerr
+                url: https://verzoekjes.bycamiel.nl
+                icon: overseerr
+              - type: service
+                name: Synology Photos
+                url: https://photos.bycamiel.nl
+                icon: photos
+              - type: service
+                name: Bookorbit
+                url: https://boeken.bycamiel.nl
+                icon: book
+              - type: service
+                name: Deadair
+                url: https://radio.bycamiel.nl
+                icon: radio
+
+      # 4. Downloads & Automation Column
+      - size: small
+        widgets:
+          - type: group
+            title: DOWNLOADS & AUTOMATION
+            widgets:
+              - type: service
+                name: Sabnzbd
+                url: https://downloads.bycamiel.nl
+                icon: sabnzbd
+              - type: service
+                name: Spotweb
+                url: https://spotweb.bycamiel.nl
+                icon: spotweb
+              - type: service
+                name: Prowlarr
+                url: https://servers.bycamiel.nl
+                icon: prowlarr
+              - type: service
+                name: Radarr
+                url: https://films.bycamiel.nl
+                icon: radarr
+              - type: service
+                name: Radarr4k
+                url: https://films4k.bycamiel.nl
+                icon: radarr-4k
+              - type: service
+                name: Sonarr
+                url: https://series.bycamiel.nl
+                icon: sonarr
+              - type: service
+                name: Bazarr
+                url: https://ondertitels.bycamiel.nl
+                icon: bazarr
+
+      # Host Health & Diagnostics
+      - size: full
+        widgets:
+          - type: group
+            title: K28 - KOLENKACHEL HOST HEALTH
+            widgets:
+              - type: cpu-history
+                title: CPU Usage
+              - type: memory
+                title: System Memory
+              - type: disk-usage
+                title: Storage Pools
+
+      # Quick Homelab Links
+      - size: full
+        widgets:
+          - type: group
+            title: OTHER LINKS
+            widgets:
+              - type: link
+                name: Router
+                url: http://192.168.1.1
+              - type: link
+                name: Tailscale Admin
+                url: https://login.tailscale.com/admin
+              - type: link
+                name: Synology DSM
+                url: https://nas.bycamiel.nl
+              - type: link
+                name: Dockhand
+                url: https://docker.bycamiel.nl
+              - type: link
+                name: Adguard DNS
+                url: https://adguard.bycamiel.nl
