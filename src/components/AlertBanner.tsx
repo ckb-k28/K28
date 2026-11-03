@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, AlertCircle, Info, X, Smartphone, Check } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info, Smartphone, Check } from 'lucide-react';
 import { AlertEvent } from '../types/server';
 
 interface AlertBannerProps {
@@ -29,10 +29,10 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({
     <div
       className={`relative z-20 flex items-center justify-between px-4 py-2 text-xs transition-colors ${
         isCritical
-          ? 'bg-rose-500 text-white'
+          ? 'bg-[#D84315] text-white'
           : isWarning
-          ? 'bg-amber-500 text-slate-950 font-medium'
-          : 'bg-sky-600 text-white'
+          ? 'bg-[#FF8F00] text-[#232527] font-medium'
+          : 'bg-[#00B4D8] text-[#232527] font-medium'
       }`}
     >
       <div className="flex items-center gap-2.5 overflow-hidden">
@@ -53,7 +53,7 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({
           {count > 1 && (
             <button
               onClick={onNavigateToRules}
-              className="text-[11px] underline font-bold shrink-0 hover:opacity-80"
+              className="text-[11px] underline font-bold shrink-0 hover:opacity-80 cursor-pointer"
             >
               +{count - 1} more alert{count > 2 ? 's' : ''}
             </button>
@@ -64,7 +64,7 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({
       <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={onOpenMobileModal}
-          className="hidden md:flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-black/20 hover:bg-black/30 transition-colors"
+          className="hidden md:flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-black/20 hover:bg-black/30 transition-colors cursor-pointer"
         >
           <Smartphone className="w-3 h-3" />
           <span>Mobile Alerts</span>
@@ -72,7 +72,7 @@ export const AlertBanner: React.FC<AlertBannerProps> = ({
 
         <button
           onClick={() => onAcknowledge(activeAlert.id)}
-          className="flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-black/25 hover:bg-black/40 transition-colors"
+          className="flex items-center gap-1 px-2.5 py-0.5 rounded text-[11px] font-semibold bg-black/25 hover:bg-black/40 transition-colors cursor-pointer"
         >
           <Check className="w-3 h-3" />
           <span>Acknowledge</span>

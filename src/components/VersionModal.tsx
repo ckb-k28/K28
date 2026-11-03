@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Tag, Calendar, Check, Copy, Sparkles, Server, ArrowUpRight } from 'lucide-react';
 import { CURRENT_VERSION } from '../version';
+import { KolenkachelIcon } from './KolenkachelIcon';
 
 interface VersionModalProps {
   isOpen: boolean;
@@ -24,12 +25,12 @@ export const VersionModal: React.FC<VersionModalProps> = ({ isOpen, onClose }) =
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/40">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
-              <Tag className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-slate-900 dark:bg-[#161922] border border-slate-800 dark:border-[#272c3b] flex items-center justify-center p-1 shrink-0 shadow-xs">
+              <KolenkachelIcon className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                Project Version
+                K28 - Kolenkachel Version
               </h3>
               <p className="text-[11px] font-mono text-slate-400">
                 Format: {CURRENT_VERSION.format}

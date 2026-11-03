@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Header } from './components/Header';
 import { DynacatDashboard } from './components/DynacatDashboard';
+import { DynacatEditorModal } from './components/DynacatEditorModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { Sidebar } from './components/Sidebar';
 import { MetricsOverview } from './components/MetricsOverview';
-import { ServicesTableView } from './components/ServicesTableView';
 import { DisksView } from './components/DisksView';
 import { AlertRulesView } from './components/AlertRulesView';
 import { MobileAlertsModal } from './components/MobileAlertsModal';
@@ -12,6 +12,8 @@ import { ServiceModal } from './components/ServiceModal';
 import { DockerModal } from './components/DockerModal';
 import { ServiceDetailDrawer } from './components/ServiceDetailDrawer';
 import { AlertBanner } from './components/AlertBanner';
+import { VersionModal } from './components/VersionModal';
+import { Footer } from './components/Footer';
 import {
   INITIAL_SERVICES,
   INITIAL_QUICK_LINKS,
@@ -19,6 +21,7 @@ import {
   INITIAL_ALERT_RULES,
   INITIAL_MOBILE_CONFIG,
   INITIAL_ALERTS,
+  INITIAL_DYNACAT_LAYOUT,
 } from './data/defaultData';
 import {
   ServerService,
@@ -28,6 +31,7 @@ import {
   AlertEvent,
   MetricHistoryPoint,
   QuickLink,
+  DynacatLayoutConfig,
 } from './types/server';
 import { TelemetryEngine } from './services/telemetryEngine';
 import { dispatchAlert } from './services/alertDispatcher';
@@ -68,6 +72,26 @@ export default function App() {
     localStorage.setItem('k28_link_mode', linkMode);
   }, [linkMode]);
 
+  // Dynacat Layout & Widget Configuration State
+  const [dynacatLayout, setDynacatLayout] = useState<DynacatLayoutConfig>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('k28_dynacat_layout_v1');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {}
+      }
+    }
+    return INITIAL_DYNACAT_LAYOUT;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('k28_dynacat_layout_v1', JSON.stringify(dynacatLayout));
+  }, [dynacatLayout]);
+
+  const [isDynacatEditMode, setIsDynacatEditMode] = useState(false);
+  const [isDynacatEditorOpen, setIsDynacatEditorOpen] = useState(false);
+
   // Core Data States with localStorage persistence
   const [services, setServices] = useState<ServerService[]>(() => {
     if (typeof window !== 'undefined') {
@@ -75,7 +99,9 @@ export default function App() {
       if (saved) {
         try {
           const parsed: ServerService[] = JSON.parse(saved);
-          return parsed.map((s) => s.id === 'srv-dockhand' && s.port === 3666 ? { ...s, port: 3866 } : s);
+          return parsed.map((s) =>
+            s.id === 'srv-dockhand' && s.port === 3666 ? { ...s, port: 3866 } : s
+          );
         } catch {}
       }
     }
@@ -91,7 +117,10 @@ export default function App() {
       const saved = localStorage.getItem('k28_quick_links_v4');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed: QuickLink[] = JSON.parse(saved);
+          return parsed.filter(
+            (l) => l.id !== 'ql-tailscale' && !l.name.toLowerCase().includes('tailscale')
+          );
         } catch {}
       }
     }
@@ -162,7 +191,11 @@ export default function App() {
     const now = Date.now();
     for (let i = 29; i >= 0; i--) {
       points.push({
-        time: new Date(now - i * 2000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        time: new Date(now - i * 2000).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
         timestamp: now - i * 2000,
         cpu: Number((1.8 + Math.random() * 0.8).toFixed(1)),
         memory: Number((65 + Math.random() * 1).toFixed(1)),
@@ -180,6 +213,7 @@ export default function App() {
   const [serviceToEdit, setServiceToEdit] = useState<ServerService | null>(null);
   const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [isDockerModalOpen, setIsDockerModalOpen] = useState(false);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
 
   // Engine ref
   const engineRef = useRef<TelemetryEngine>(new TelemetryEngine());
@@ -356,7 +390,7 @@ export default function App() {
   }, [alerts]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc] dark:bg-[#0b0c0e] text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="min-h-screen flex flex-col bg-[#E6E7E9] dark:bg-[#2E3134] text-[#232527] dark:text-[#E6E7E9] transition-colors">
       {/* Live Alert Notification Strip */}
       <AlertBanner
         alerts={alerts}
@@ -381,11 +415,15 @@ export default function App() {
         }}
         onOpenMobileModal={() => setIsMobileModalOpen(true)}
         onOpenDockerModal={() => setIsDockerModalOpen(true)}
+        onOpenDynacatEditor={() => setIsDynacatEditorOpen(true)}
+        isDynacatEditMode={isDynacatEditMode}
+        onToggleDynacatEditMode={() => setIsDynacatEditMode((prev) => !prev)}
         isDark={isDark}
         toggleTheme={() => setIsDark((prev) => !prev)}
         unreadAlertCount={unreadAlertCount}
         linkMode={linkMode}
         onToggleLinkMode={() => setLinkMode((prev) => (prev === 'lan' ? 'subdomain' : 'lan'))}
+        onOpenVersionModal={() => setIsVersionModalOpen(true)}
       />
 
       {/* Main Viewport */}
@@ -397,6 +435,11 @@ export default function App() {
               services={services}
               metrics={metrics}
               quickLinks={quickLinks}
+              layout={dynacatLayout}
+              onUpdateLayout={(next) => setDynacatLayout(next)}
+              isEditMode={isDynacatEditMode}
+              onToggleEditMode={() => setIsDynacatEditMode((prev) => !prev)}
+              onOpenDynacatEditor={() => setIsDynacatEditorOpen(true)}
               onSelectService={(service) => setSelectedService(service)}
               onAddService={() => {
                 setServiceToEdit(null);
@@ -405,6 +448,7 @@ export default function App() {
               onOpenMobileModal={() => setIsMobileModalOpen(true)}
               linkMode={linkMode}
               onToggleLinkMode={() => setLinkMode((prev) => (prev === 'lan' ? 'subdomain' : 'lan'))}
+              onOpenVersionModal={() => setIsVersionModalOpen(true)}
             />
           </main>
         )}
@@ -441,6 +485,13 @@ export default function App() {
                 />
 
                 <DisksView disks={metrics.disks} />
+
+                <div className="pt-8">
+                  <Footer
+                    onOpenVersionModal={() => setIsVersionModalOpen(true)}
+                    linkMode={linkMode}
+                  />
+                </div>
               </div>
             </main>
           </div>
@@ -449,7 +500,7 @@ export default function App() {
         {/* Render Tab 3: Feeds & Mobile Alerts Configuration */}
         {activeTab === 'feeds' && (
           <main className="flex-1 overflow-y-auto p-4 sm:p-8">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-5xl mx-auto space-y-8">
               <AlertRulesView
                 rules={alertRules}
                 alerts={alerts}
@@ -461,6 +512,13 @@ export default function App() {
                 onClearAlertHistory={() => setAlerts([])}
                 onOpenMobileModal={() => setIsMobileModalOpen(true)}
               />
+
+              <div className="pt-4">
+                <Footer
+                  onOpenVersionModal={() => setIsVersionModalOpen(true)}
+                  linkMode={linkMode}
+                />
+              </div>
             </div>
           </main>
         )}
@@ -499,6 +557,26 @@ export default function App() {
         serverIp={metrics.network.ipAddress}
       />
 
+      {/* Dynacat Widgets, Components & YAML Studio Modal */}
+      <DynacatEditorModal
+        isOpen={isDynacatEditorOpen}
+        onClose={() => setIsDynacatEditorOpen(false)}
+        layout={dynacatLayout}
+        onUpdateLayout={(next) => setDynacatLayout(next)}
+        services={services}
+        onAddService={() => {
+          setServiceToEdit(null);
+          setIsServiceModalOpen(true);
+        }}
+        onEditService={(srv) => {
+          setServiceToEdit(srv);
+          setIsServiceModalOpen(true);
+        }}
+        onDeleteService={handleDeleteService}
+        quickLinks={quickLinks}
+        onUpdateQuickLinks={(links) => setQuickLinks(links)}
+      />
+
       {/* Mobile Alerts & Pairing Modal */}
       <MobileAlertsModal
         isOpen={isMobileModalOpen}
@@ -511,6 +589,12 @@ export default function App() {
       <DockerModal
         isOpen={isDockerModalOpen}
         onClose={() => setIsDockerModalOpen(false)}
+      />
+
+      {/* Version & Build Modal */}
+      <VersionModal
+        isOpen={isVersionModalOpen}
+        onClose={() => setIsVersionModalOpen(false)}
       />
     </div>
   );

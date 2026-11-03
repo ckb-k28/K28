@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const APP_VERSION = process.env.APP_VERSION || '2026.11.03.4';
+const APP_VERSION = process.env.APP_VERSION || '2026.11.03.8';
 
 app.use(express.json());
 
@@ -23,10 +23,47 @@ app.get('/api/version', (_req: Request, res: Response) => {
     year: 2026,
     month: 11,
     day: 3,
-    build: 4,
+    build: 8,
     releaseDate: '2026-11-03',
     projectName: 'K28 - Kolenkachel'
   });
+});
+
+// Dynacat Configuration File Endpoints (reads/writes ./config/dynacat.yaml for live hot-reload)
+const DYNACAT_CONFIG_PATH = path.resolve(process.cwd(), 'config', 'dynacat.yaml');
+
+app.get('/api/dynacat/config', (_req: Request, res: Response) => {
+  try {
+    if (fs.existsSync(DYNACAT_CONFIG_PATH)) {
+      const yaml = fs.readFileSync(DYNACAT_CONFIG_PATH, 'utf-8');
+      return res.json({ ok: true, yaml, path: 'config/dynacat.yaml' });
+    }
+    return res.json({ ok: false, yaml: '', error: 'config/dynacat.yaml not found' });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err.message || 'Failed to read dynacat.yaml' });
+  }
+});
+
+app.post('/api/dynacat/config', (req: Request, res: Response) => {
+  try {
+    const { yaml } = req.body;
+    if (typeof yaml !== 'string' || !yaml.trim()) {
+      return res.status(400).json({ ok: false, error: 'Valid YAML string is required' });
+    }
+    const configDir = path.dirname(DYNACAT_CONFIG_PATH);
+    if (!fs.existsSync(configDir)) {
+      fs.mkdirSync(configDir, { recursive: true });
+    }
+    fs.writeFileSync(DYNACAT_CONFIG_PATH, yaml, 'utf-8');
+    return res.json({
+      ok: true,
+      savedAt: new Date().toISOString(),
+      path: 'config/dynacat.yaml',
+      message: 'Saved config/dynacat.yaml — Dynacat hot-reload triggered.'
+    });
+  } catch (err: any) {
+    return res.status(500).json({ ok: false, error: err.message || 'Failed to write dynacat.yaml' });
+  }
 });
 
 function normalizeDockhandBaseUrl(rawUrl: string | undefined, defaultUrl: string): string {

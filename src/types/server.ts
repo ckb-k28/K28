@@ -19,6 +19,47 @@ export interface QuickLink {
   icon?: string;
 }
 
+export type DynacatWidgetType =
+  | 'adguard-dns'
+  | 'downloads-queue'
+  | 'emby-streams'
+  | 'dockhand-containers'
+  | 'system-clock'
+  | 'weather'
+  | 'custom-stat';
+
+export interface DynacatWidget {
+  id: string;
+  type: DynacatWidgetType;
+  title: string;
+  primaryValue: string;
+  secondaryTop: string;
+  secondaryBottom: string;
+  accentColor: 'ember' | 'amber' | 'flame'; // #D84315 | #FF8F00 | #00B4D8
+  enabled: boolean;
+}
+
+export interface DynacatSectionConfig {
+  id: 'live-widgets' | 'service-columns' | 'host-health' | 'quick-links';
+  title: string;
+  enabled: boolean;
+  order: number;
+}
+
+export interface DynacatHostHealthItems {
+  showCpu: boolean;
+  showRam: boolean;
+  showSystemDisk: boolean;
+  showVmStorage: boolean;
+}
+
+export interface DynacatLayoutConfig {
+  widgets: DynacatWidget[];
+  sections: DynacatSectionConfig[];
+  hostHealth: DynacatHostHealthItems;
+  customYaml?: string;
+}
+
 export interface ServerService {
   id: string;
   name: string;

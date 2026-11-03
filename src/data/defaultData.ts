@@ -1,4 +1,12 @@
-import { ServerService, ServerMetrics, AlertRule, MobileAlertConfig, AlertEvent, QuickLink } from '../types/server';
+import {
+  ServerService,
+  ServerMetrics,
+  AlertRule,
+  MobileAlertConfig,
+  AlertEvent,
+  QuickLink,
+  DynacatLayoutConfig,
+} from '../types/server';
 
 export const INITIAL_SERVICES: ServerService[] = [
   // ==========================================
@@ -419,7 +427,6 @@ export const INITIAL_SERVICES: ServerService[] = [
 
 export const INITIAL_QUICK_LINKS: QuickLink[] = [
   { id: 'ql-router', name: 'Gateway (10.0.0.1)', url: 'http://10.0.0.1' },
-  { id: 'ql-tailscale', name: 'Tailscale Admin', url: 'https://login.tailscale.com/admin' },
   { id: 'ql-nas', name: 'Synology DSM', url: 'https://nas.bycamiel.nl' },
   { id: 'ql-docker', name: 'Dockhand', url: 'https://docker.bycamiel.nl' },
   { id: 'ql-adguard', name: 'Adguard DNS', url: 'https://adguard.bycamiel.nl' },
@@ -561,3 +568,217 @@ export const INITIAL_ALERTS: AlertEvent[] = [
     channel: ['Web Push', 'ntfy'],
   },
 ];
+
+export const INITIAL_DYNACAT_LAYOUT: DynacatLayoutConfig = {
+  widgets: [
+    {
+      id: 'wid-adguard',
+      type: 'adguard-dns',
+      title: 'AdGuard DNS',
+      primaryValue: '34.2% Blocked',
+      secondaryTop: '84.1k reqs',
+      secondaryBottom: '2ms avg',
+      accentColor: 'flame',
+      enabled: true,
+    },
+    {
+      id: 'wid-downloads',
+      type: 'downloads-queue',
+      title: 'Downloads Active',
+      primaryValue: '14.2 MB/s',
+      secondaryTop: 'Sabnzbd Queue',
+      secondaryBottom: 'ETA 12m',
+      accentColor: 'amber',
+      enabled: true,
+    },
+    {
+      id: 'wid-emby',
+      type: 'emby-streams',
+      title: 'Emby Media',
+      primaryValue: '2 Active Streams',
+      secondaryTop: 'Living Room 4K',
+      secondaryBottom: 'Direct Play',
+      accentColor: 'ember',
+      enabled: true,
+    },
+    {
+      id: 'wid-dockhand',
+      type: 'dockhand-containers',
+      title: 'Dockhand Stack',
+      primaryValue: '19 / 19 Up',
+      secondaryTop: '10.0.0.100:3866',
+      secondaryBottom: 'Proxy Active',
+      accentColor: 'flame',
+      enabled: false,
+    },
+    {
+      id: 'wid-clock',
+      type: 'system-clock',
+      title: 'Homelab Time',
+      primaryValue: 'Europe/Amsterdam',
+      secondaryTop: 'NTP Synced',
+      secondaryBottom: 'Node K28',
+      accentColor: 'amber',
+      enabled: false,
+    },
+    {
+      id: 'wid-weather',
+      type: 'weather',
+      title: 'Server Room Env',
+      primaryValue: '21.4°C Indoor',
+      secondaryTop: '44% Humidity',
+      secondaryBottom: 'Nominal Airflow',
+      accentColor: 'ember',
+      enabled: false,
+    },
+  ],
+  sections: [
+    { id: 'live-widgets', title: 'Live Dynacat Widgets Strip', enabled: true, order: 0 },
+    { id: 'service-columns', title: '4 Categorized Service Columns', enabled: true, order: 1 },
+    { id: 'host-health', title: 'K28 - Kolenkachel Host Health', enabled: true, order: 2 },
+    { id: 'quick-links', title: 'Other Links Bar', enabled: true, order: 3 },
+  ],
+  hostHealth: {
+    showCpu: true,
+    showRam: true,
+    showSystemDisk: true,
+    showVmStorage: true,
+  },
+};
+
+export function generateDynacatYaml(
+  services: ServerService[],
+  quickLinks: QuickLink[],
+  layout: DynacatLayoutConfig
+): string {
+  const infra = services.filter(
+    (s) => s.category === 'Infrastructure' || s.category === 'Network & DNS' || s.category === 'Security'
+  );
+  const apps = services.filter((s) => s.category === 'Apps' || s.category === 'Smart Home');
+  const media = services.filter((s) => s.category === 'Media');
+  const downloads = services.filter(
+    (s) => s.category === 'Downloads & Automation' || s.category === 'Development'
+  );
+
+  const enabledWidgets = layout.widgets.filter((w) => w.enabled);
+
+  const formatServiceItems = (list: ServerService[]) =>
+    list
+      .map(
+        (s) => `              - type: service
+                name: ${s.name}
+                url: ${s.dashboardUrl}
+                port: ${s.port}
+                container: ${s.dockerContainer || s.name.toLowerCase()}`
+      )
+      .join('\n');
+
+  const formatWidgetItems = () =>
+    enabledWidgets
+      .map(
+        (w) => `              - type: ${w.type}
+                title: "${w.title}"
+                value: "${w.primaryValue}"
+                subtitle: "${w.secondaryTop} (${w.secondaryBottom})"
+                accent: "${w.accentColor === 'ember' ? '#D84315' : w.accentColor === 'amber' ? '#FF8F00' : '#00B4D8'}"`
+      )
+      .join('\n');
+
+  const formatQuickLinks = () =>
+    quickLinks
+      .filter((l) => l.id !== 'ql-tailscale' && !l.name.toLowerCase().includes('tailscale'))
+      .map(
+        (l) => `              - type: link
+                name: "${l.name}"
+                url: ${l.url}`
+      )
+      .join('\n');
+
+  return `# Dynacat Configuration for K28 - Kolenkachel
+# Documentation: https://dynacat.artur.zone
+# Project: https://github.com/Panonim/dynacat (Latest Release v3.0.2)
+
+theme:
+  background: "#2E3134"
+  surface: "#3A3D40"
+  light-background: "#E6E7E9"
+  primary-color: "#FF8F00"
+  ember-color: "#D84315"
+  flame-color: "#00B4D8"
+  contrast-multiplier: 1.1
+
+pages:
+  - name: Home
+    columns:
+      # Live Dynacat Widgets Strip
+      - size: full
+        enabled: ${layout.sections.find((s) => s.id === 'live-widgets')?.enabled ?? true}
+        widgets:
+          - type: group
+            title: LIVE WIDGETS
+            widgets:
+${formatWidgetItems() || '              []'}
+
+      # 1. Infrastructure Column
+      - size: small
+        widgets:
+          - type: group
+            title: INFRASTRUCTURE
+            widgets:
+${formatServiceItems(infra)}
+
+      # 2. Apps Column
+      - size: small
+        widgets:
+          - type: group
+            title: APPS
+            widgets:
+${formatServiceItems(apps)}
+
+      # 3. Media Column
+      - size: small
+        widgets:
+          - type: group
+            title: MEDIA
+            widgets:
+${formatServiceItems(media)}
+
+      # 4. Downloads & Automation Column
+      - size: small
+        widgets:
+          - type: group
+            title: DOWNLOADS & AUTOMATION
+            widgets:
+${formatServiceItems(downloads)}
+
+      # Host Health & Diagnostics
+      - size: full
+        enabled: ${layout.sections.find((s) => s.id === 'host-health')?.enabled ?? true}
+        widgets:
+          - type: group
+            title: K28 - KOLENKACHEL HOST HEALTH
+            widgets:
+              - type: cpu-history
+                title: CPU Usage
+                enabled: ${layout.hostHealth.showCpu}
+              - type: memory
+                title: System Memory
+                enabled: ${layout.hostHealth.showRam}
+              - type: disk-usage
+                title: System Disk
+                enabled: ${layout.hostHealth.showSystemDisk}
+              - type: disk-usage
+                title: VM / Container Storage
+                enabled: ${layout.hostHealth.showVmStorage}
+
+      # Quick Homelab Links
+      - size: full
+        enabled: ${layout.sections.find((s) => s.id === 'quick-links')?.enabled ?? true}
+        widgets:
+          - type: group
+            title: OTHER LINKS
+            widgets:
+${formatQuickLinks()}
+`;
+}
+
