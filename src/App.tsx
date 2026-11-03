@@ -441,6 +441,10 @@ export default function App() {
               onToggleEditMode={() => setIsDynacatEditMode((prev) => !prev)}
               onOpenDynacatEditor={() => setIsDynacatEditorOpen(true)}
               onSelectService={(service) => setSelectedService(service)}
+              onEditService={(service) => {
+                setServiceToEdit(service);
+                setIsServiceModalOpen(true);
+              }}
               onAddService={() => {
                 setServiceToEdit(null);
                 setIsServiceModalOpen(true);
@@ -553,6 +557,8 @@ export default function App() {
           setServiceToEdit(null);
         }}
         onSave={handleSaveService}
+        onDelete={handleDeleteService}
+        onOpenDetails={(srv) => setSelectedService(srv)}
         serviceToEdit={serviceToEdit}
         serverIp={metrics.network.ipAddress}
       />

@@ -15,6 +15,7 @@ import {
   Sliders,
   Trash2,
   EyeOff,
+  Pencil,
 } from 'lucide-react';
 import {
   ServerService,
@@ -37,6 +38,7 @@ interface DynacatDashboardProps {
   onToggleEditMode: () => void;
   onOpenDynacatEditor: () => void;
   onSelectService: (service: ServerService) => void;
+  onEditService: (service: ServerService) => void;
   onAddService: () => void;
   onOpenMobileModal: () => void;
   linkMode: 'lan' | 'subdomain';
@@ -54,6 +56,7 @@ export const DynacatDashboard: React.FC<DynacatDashboardProps> = ({
   onToggleEditMode,
   onOpenDynacatEditor,
   onSelectService,
+  onEditService,
   onAddService,
   linkMode,
   onOpenVersionModal,
@@ -152,10 +155,15 @@ export const DynacatDashboard: React.FC<DynacatDashboardProps> = ({
           return (
             <div
               key={service.id}
-              onClick={() => onSelectService(service)}
               className="group relative flex items-center justify-between p-3 rounded-lg border border-[#CFD2D6] dark:border-[#4D5156] bg-white/90 dark:bg-[#3A3D40] hover:bg-white dark:hover:bg-[#43474B] hover:border-[#FF8F00] dark:hover:border-[#FF8F00] transition-all cursor-pointer shadow-xs min-h-[48px]"
             >
-              <div className="flex items-center gap-3 min-w-0">
+              <a
+                href={targetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Open ${service.name} (${targetUrl}) in a new tab ↗`}
+                className="flex items-center gap-3 min-w-0 flex-1 after:absolute after:inset-0 after:z-0"
+              >
                 <div className="shrink-0">{getServiceBrandIcon(service.name, service.category)}</div>
                 <div className="truncate">
                   <div className="flex items-center gap-1.5">
@@ -168,45 +176,66 @@ export const DynacatDashboard: React.FC<DynacatDashboardProps> = ({
                     <span className="text-[#D84315] dark:text-[#FF8F00] font-semibold shrink-0">:{service.port}</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
-              {/* Status Indicator & External Open Link */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                <a
-                  href={targetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  title={`Open ${service.name} (${targetUrl}) ↗`}
-                  className="p-1.5 text-slate-400 dark:text-[#E6E7E9]/60 hover:text-[#FF8F00] hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors"
+              {/* Edit Pencil Button & Status Indicator */}
+              <div className="relative z-10 flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onEditService(service);
+                  }}
+                  title={`Edit ${service.name}`}
+                  aria-label={`Edit ${service.name}`}
+                  className="p-1.5 text-slate-400 dark:text-[#E6E7E9]/60 hover:text-[#FF8F00] hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors cursor-pointer"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
 
-                {/* Status Dot / Checkmark Badge */}
+                {/* Status Dot / Checkmark Badge (clicks open telemetry/container drawer) */}
                 {isUp ? (
-                  <div
-                    title="Operational (Running)"
-                    className="w-5 h-5 rounded-full bg-[#00B4D8]/15 text-[#0096B4] dark:text-[#00B4D8] flex items-center justify-center shrink-0"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectService(service);
+                    }}
+                    title="Operational (Running) — Click for Container & Telemetry Details"
+                    className="w-5 h-5 rounded-full bg-[#00B4D8]/15 text-[#0096B4] dark:text-[#00B4D8] hover:bg-[#00B4D8]/30 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-3 h-3">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
-                  </div>
+                  </button>
                 ) : isWarning ? (
-                  <div
-                    title="Degraded Performance"
-                    className="w-5 h-5 rounded-full bg-[#FF8F00]/20 text-[#FF8F00] flex items-center justify-center shrink-0"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectService(service);
+                    }}
+                    title="Degraded Performance — Click for Container & Telemetry Details"
+                    className="w-5 h-5 rounded-full bg-[#FF8F00]/20 text-[#FF8F00] hover:bg-[#FF8F00]/35 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                   >
                     <span className="text-[10px] font-bold">!</span>
-                  </div>
+                  </button>
                 ) : (
-                  <div
-                    title="Container Stopped (Offline)"
-                    className="w-5 h-5 rounded-full bg-[#D84315]/20 text-[#D84315] flex items-center justify-center shrink-0"
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onSelectService(service);
+                    }}
+                    title="Container Stopped (Offline) — Click for Container & Telemetry Details"
+                    className="w-5 h-5 rounded-full bg-[#D84315]/20 text-[#D84315] hover:bg-[#D84315]/35 flex items-center justify-center shrink-0 transition-colors cursor-pointer"
                   >
                     <span className="text-[10px] font-bold">×</span>
-                  </div>
+                  </button>
                 )}
               </div>
             </div>

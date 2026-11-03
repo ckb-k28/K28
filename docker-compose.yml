@@ -1,7 +1,7 @@
 # ========================================================
 # Docker Compose for K28 - Kolenkachel Homelab Hub
 # Ready for Dockhand Git Repository Stack Auto-Deploy
-# Host: 10.0.0.100 | Domain: bycamiel.nl | Version: 2026.11.03.9
+# Host: 10.0.0.100 | Domain: bycamiel.nl | Version: 2026.11.03.10
 # ========================================================
 
 services:
@@ -10,7 +10,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: k28-kolenkachel:2026.11.03.9
+    image: k28-kolenkachel:2026.11.03.10
     container_name: k28-kolenkachel
     restart: unless-stopped
     ports:
@@ -18,7 +18,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - APP_VERSION=2026.11.03.9
+      - APP_VERSION=2026.11.03.10
       - DOCKHAND_API_KEY=${DOCKHAND_API_KEY:-}
       - DOCKHAND_API_URL=${DOCKHAND_API_URL:-http://10.0.0.100:3866}
       - DOCKHAND_REMOTE_URL=${DOCKHAND_REMOTE_URL:-https://docker.bycamiel.nl}

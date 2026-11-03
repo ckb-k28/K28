@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
-const APP_VERSION = process.env.APP_VERSION || '2026.11.03.9';
+const APP_VERSION = process.env.APP_VERSION || '2026.11.03.10';
 
 app.use(express.json());
 
@@ -23,7 +23,7 @@ app.get('/api/version', (_req: Request, res: Response) => {
     year: 2026,
     month: 11,
     day: 3,
-    build: 9,
+    build: 10,
     releaseDate: '2026-11-03',
     projectName: 'K28 - Kolenkachel'
   });
